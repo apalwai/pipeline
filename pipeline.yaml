@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: BuildConfig
 metadata:
-  name: flowerpipeline
+  name: myapp-pipeline
   namespace: 
   labels:
-    name: flowerpipeline
+    name: myapp-pipeline
   annotations:
     pipeline.alpha.openshift.io/uses: '[{"name": "", "namespace": "", "kind": "DeploymentConfig"}]'
 spec:

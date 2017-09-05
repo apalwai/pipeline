@@ -48,7 +48,9 @@ oc policy add-role-to-user edit system:serviceaccount:cicd:jenkins -n test
 
 The test project needs to be able to pull images from the development environment
 
+```
 oc policy add-role-to-group system:image-puller system:serviceaccounts:test -n dev
+```
 
 #### Create Application
 
@@ -66,7 +68,7 @@ IMPORTANT - go to the advanced configuration and disabled all builds and deploym
 We also need to create a deployment configuration in the test project for ```myapp```:
 
 ```
-oc create deploymentconfig myapp --image=<<RegistryServiceIP>>:5000/dev/myapp:promoteToQA -n testing
+oc create deploymentconfig myapp --image=<<RegistryServiceIP>>:5000/dev/myapp:promoteToQA -n test
 ```
 
 Note you can get the Registry Service IP and Port by running:
