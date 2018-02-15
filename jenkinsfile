@@ -1,18 +1,18 @@
 node('maven') {
   stage 'buildInDevelopment'
-  openshiftBuild(namespace: 'db-dev', buildConfig: 'myapp', showBuildLogs: 'true')
+  openshiftBuild(namespace: 'ocp-msnet-dev', buildConfig: 'musicstore', showBuildLogs: 'true')
 }
 
 node {
   stage 'deployInDevelopment'
-  openshiftDeploy(namespace: 'db-dev', deploymentConfig: 'myapp')
-  openshiftScale(namespace: 'db-dev', deploymentConfig: 'myapp',replicaCount: '2')
+  openshiftDeploy(namespace: 'ocp-msnet-dev', deploymentConfig: 'musicstore')
+  openshiftScale(namespace: 'ocp-msnet-dev', deploymentConfig: 'musicstore',replicaCount: '2')
 }
 
 node {
   stage 'test'
   try {
-    sh "curl -s --head --request GET http://myapp-db-dev.apps.ose3sandbox.com/ | grep '200 OK'"
+    sh "curl -s --head --request GET http://musicstore-ocp-msnet-dev.apps.myocp.net/ | grep '200 OK'"
     return true
   } catch (Exception e) {
     return false
@@ -26,7 +26,7 @@ node {
 
 node {
   stage 'deployInTesting'
-  openshiftTag(namespace: 'db-dev', sourceStream: 'myapp',  sourceTag: 'latest', destinationNamespace: 'db-dev',  destinationStream: 'myapp', destinationTag: 'promoteToQA')
-  openshiftDeploy(namespace: 'db-test', deploymentConfig: 'myapp')
-  openshiftScale(namespace: 'db-test', deploymentConfig: 'myapp',replicaCount: '3')
+  openshiftTag(namespace: 'ocp-msnet-dev', sourceStream: 'musicstore',  sourceTag: 'latest', destinationNamespace: 'ocp-msnet-dev',  destinationStream: 'musicstore', destinationTag: 'promoteToQA')
+  openshiftDeploy(namespace: 'ocp-msnet-qa', deploymentConfig: 'musicstore')
+  openshiftScale(namespace: 'ocp-msnet-qa', deploymentConfig: 'musicstore',replicaCount: '3')
 }
