@@ -1,0 +1,32 @@
+node('maven') {
+  stage 'buildInDevelopment'
+  openshiftBuild(namespace: 'netcore-ocp-dev', buildConfig: 'myapp', showBuildLogs: 'true')
+}
+
+node {
+  stage 'deployInDevelopment'
+  openshiftDeploy(namespace: 'netcore-ocp-dev', deploymentConfig: 'myapp')
+  openshiftScale(namespace: 'netcore-ocp-dev', deploymentConfig: 'myapp',replicaCount: '2')
+}
+
+node {
+  stage 'test'
+  try {
+    sh "curl -s --head --request GET http://myapp-netcore-ocp-dev.apps.myocp.net/ | grep '200 OK'"
+    return true
+  } catch (Exception e) {
+    return false
+  }
+}
+
+node {
+  stage 'Deploy Live' 
+  input 'Promote the Dev image to Live?'
+}
+
+node {
+  stage 'deployInTesting'
+  openshiftTag(namespace: 'netcore-ocp-dev', sourceStream: 'myapp',  sourceTag: 'latest', destinationNamespace: 'netcore-ocp-dev',  destinationStream: 'myapp', destinationTag: 'promoteToQA')
+  openshiftDeploy(namespace: 'netcore-ocp-qa', deploymentConfig: 'myapp')
+  openshiftScale(namespace: 'netcore-ocp-qa', deploymentConfig: 'myapp',replicaCount: '3')
+}
